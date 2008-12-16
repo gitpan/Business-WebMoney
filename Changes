@@ -1,0 +1,6 @@
+Revision history for Perl extension Business::WebMoney.
+
+0.01  Sat Dec 13 09:56:05 2008
+	- original version; created by h2xs 1.23 with options
+		-AXc --skip-exporter --skip-ppport --skip-autoloader -b 5.8.0 -n Business::WebMoney
+
