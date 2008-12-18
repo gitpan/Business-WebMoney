@@ -4,7 +4,7 @@ use 5.008000;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use Carp;
 use LWP::UserAgent;
@@ -982,6 +982,8 @@ To prevent such threats register separate WMID and give it permission to access 
 =item * C<HTTPS_PROXY> - proxy support, http://host_or_ip:port
 
 =item * C<HTTPS_PROXY_USERNAME> and C<HTTPS_PROXY_PASSWORD> - proxy basic auth
+
+=back
 
 =head1 BUGS
 
