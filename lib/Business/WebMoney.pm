@@ -4,7 +4,7 @@ use 5.008000;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 use Carp;
 use LWP::UserAgent;
@@ -123,7 +123,9 @@ sub request
 
 		my $req_data = $doc->serialize;
 
-		use bytes;
+		eval {
+			$req_data = Encode::encode('utf-8', $req_data);
+		};
 
 		my $res_content;
 
@@ -136,7 +138,6 @@ sub request
 			$req->method('POST');
 			$req->uri("https://w3s.wmtransfer.com/asp/XML$args{func}Cert.asp");
 			$req->content($req_data);
-			$req->header('Content-Length', length($req_data));
 
 			my $res = $ua->request($req);
 
@@ -956,7 +957,7 @@ On error returns undef. On success returns reference to array of invoices. Each 
 
   $wm->money_back(
     reqn => 19,
-    inwmtranid => '123123123',		# Transaction ID (mandatory
+    inwmtranid => '123123123',		# Transaction ID (mandatory)
     amount => 100,			# Amount of transaction (self-check). Must match the transaction being returned (mandatory)
   ) or die $wm->errstr;
 
@@ -970,7 +971,7 @@ On error returns undef. On success returns reference to confirmation hash.
 The module is bundled with WebMoney CA certificate to validate identity of the WebMoney server.
 
 =item *
-Be especially careful when using certificate with money transfer permission on the production servers. Stolen cerficate can be easily reimported to the browser and used to steal your money.
+Be especially careful when using certificate with money transfer permission on the production servers. Stolen certificate can be easily reimported to the browser and used to steal your money.
 To prevent such threats register separate WMID and give it permission to access purses of the main WMID in read-only mode. This can be set up using L<https://security.wmtransfer.com/>
 
 =back
