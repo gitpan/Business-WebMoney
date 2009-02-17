@@ -2,6 +2,7 @@ Changes
 Makefile.PL
 MANIFEST
 README
+manual-test.pl
 t/Business-WebMoney.t
 t/Business-WebMoney-Exchanger.t
 lib/Business/WebMoney.pm

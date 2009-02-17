@@ -3,8 +3,9 @@ package Business::WebMoney;
 use 5.008000;
 use strict;
 use warnings;
+use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Carp;
 use LWP::UserAgent;
@@ -123,9 +124,7 @@ sub request
 
 		my $req_data = $doc->serialize;
 
-		eval {
-			$req_data = Encode::encode('utf-8', $req_data);
-		};
+		utf8::downgrade($req_data, 1);
 
 		my $res_content;
 
