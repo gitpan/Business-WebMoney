@@ -5,13 +5,14 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Carp;
 use LWP::UserAgent;
 use XML::LibXML;
 use HTTP::Request;
 use File::Spec;
+use POSIX();
 
 sub new
 {
@@ -82,6 +83,19 @@ sub request
 {
 	my ($self, %args) = @_;
 
+	my $old_locale = POSIX::setlocale(POSIX::LC_ALL, 'C');
+
+	my $res = $self->do_request(%args);
+
+	POSIX::setlocale(POSIX::LC_ALL, $old_locale);
+
+	return $res;
+}
+
+sub do_request
+{
+	my ($self, %args) = @_;
+
 	$self->{errstr} = undef;
 	$self->{errcode} = undef;
 
@@ -124,23 +138,40 @@ sub request
 
 		my $req_data = $doc->serialize;
 
-		utf8::downgrade($req_data, 1);
+		utf8::encode($req_data) if utf8::is_utf8($req_data);
 
 		my $res_content;
 
 		unless ($res_content = $req_fields->{debug_response}) {
 
 			my $ua = LWP::UserAgent->new;
-			$ua->timeout($self->{timeout});
+			$ua->timeout($self->{timeout} + 1);
 
 			my $req = HTTP::Request->new;
 			$req->method('POST');
 			$req->uri("https://w3s.wmtransfer.com/asp/XML$args{func}Cert.asp");
 			$req->content($req_data);
 
-			my $res = $ua->request($req);
+			my ($res, $timeout);
 
-			unless ($res->is_success) {
+			eval {
+				local $SIG{__DIE__};
+				local $SIG{ALRM} = sub {
+					$timeout = 1;
+				};
+
+				alarm($self->{timeout});
+				$res = $ua->request($req);
+				alarm(0);
+			};
+
+			if ($timeout) {
+
+				$self->{errcode} = -1001;
+				$self->{errstr} = 'Connection timeout';
+				return undef;
+
+			} elsif (!$res->is_success) {
 
 				$self->{errcode} = $res->code;
 				$self->{errstr} = $res->message;
@@ -686,7 +717,7 @@ On failure functions return C<undef>. Error code and description are available v
     orderid => 345,			# Order ID (invoice in your system, optional)
   );
 
-On error returns undef. On success returns reference to array of transactions. Each transaction is a hash:
+On error returns C<undef>. On success returns reference to array of transactions. Each transaction is a hash:
 
 =over 4
 
@@ -738,7 +769,7 @@ On error returns undef. On success returns reference to array of transactions. E
     expiration => 3,			# Maximum valid period in days (An integer in the range: 0 - 255; zero means that the valid period is not defined, optional)
   );
 
-On error returns undef. On success returns reference to confirmation hash.
+On error returns C<undef>. On success returns reference to confirmation hash.
 
 =head2 get_out_invoices - check invoices status (Interface X4)
 
@@ -751,7 +782,7 @@ On error returns undef. On success returns reference to confirmation hash.
     orderid => 123,			# Serial invoice number set by the store (optional)
   ) or die $wm->errstr;
 
-On error returns undef. On success returns reference to array of invoices. Each invoice is a hash:
+On error returns C<undef>. On success returns reference to array of invoices. Each invoice is a hash:
 
 =over 4
 
@@ -801,7 +832,7 @@ On error returns undef. On success returns reference to array of invoices. Each 
     wminvid => 123123123,		# Invoice number (in the WebMoney system). 0 means that transfer is made without invoice (optional)
   ) or die $wm->errstr;
 
-On error returns undef. On success returns reference to confirmation hash:
+On error returns C<undef>. On success returns reference to confirmation hash:
 
 =over 4
 
@@ -843,7 +874,7 @@ On error returns undef. On success returns reference to confirmation hash:
     pcode => 'secret',			# Protection code. In the range 0 - 255 characters; without spaces in the beginning and in the end (mandatory)
   ) or die $wm->errstr;
 
-On error returns undef. On success returns reference to confirmation hash:
+On error returns C<undef>. On success returns reference to confirmation hash:
 
 =over 4
 
@@ -864,7 +895,7 @@ On error returns undef. On success returns reference to confirmation hash:
     wmtranid => '123123123',		# Transfer number in the WebMoney system (mandatory)
   ) or die $wm->errstr;
 
-On error returns undef. On success returns reference to confirmation hash:
+On error returns C<undef>. On success returns reference to confirmation hash:
 
 =over 4
 
@@ -887,7 +918,7 @@ On error returns undef. On success returns reference to confirmation hash:
     msgtext => 'Bar',			# Message body, 0 - 1024 characters without spaces in the beginning and in the end (mandatory)
   ) or die $wm->errstr;
 
-On error returns undef. On success returns reference to confirmation hash.
+On error returns C<undef>. On success returns reference to confirmation hash.
 
 =head2 balance - check purses balance (Interface X9)
 
@@ -896,7 +927,7 @@ On error returns undef. On success returns reference to confirmation hash.
     wmid => '000000000000',		# WMID, 12 digits (mandatory)
   ) or die $wm->errstr;
 
-On error returns undef. On success returns reference to array of purses. Each purse is a hash:
+On error returns C<undef>. On success returns reference to array of purses. Each purse is a hash:
 
 =over 4
 
@@ -918,7 +949,7 @@ On error returns undef. On success returns reference to array of purses. Each pu
     datefinish => '20090101 00:00:00',	# Maximum time and date of invoice creation (mandatory)
   ) or die $wm->errstr;
 
-On error returns undef. On success returns reference to array of invoices. Each invoice is a hash:
+On error returns C<undef>. On success returns reference to array of invoices. Each invoice is a hash:
 
 =over 4
 
@@ -960,7 +991,7 @@ On error returns undef. On success returns reference to array of invoices. Each 
     amount => 100,			# Amount of transaction (self-check). Must match the transaction being returned (mandatory)
   ) or die $wm->errstr;
 
-On error returns undef. On success returns reference to confirmation hash.
+On error returns C<undef>. On success returns reference to confirmation hash.
 
 =head1 SECURITY
 

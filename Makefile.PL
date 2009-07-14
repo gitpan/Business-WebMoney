@@ -12,6 +12,7 @@ WriteMakefile(
 	    'XML::LibXML' => 0,
 	    'HTTP::Request' => 0,
 	    'File::Spec' => 0,
+	    'POSIX' => 0,
     }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Business/WebMoney.pm', # retrieve abstract from module

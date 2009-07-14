@@ -47,14 +47,14 @@ my $my_purse;
 		wmid => $my_wmid,
 	) or die $wm->errstr;
 
-	@$res or die 'This WMID has not any purses';
+	@$res or die 'This WMID has no purses';
 
 	for my $purse (@$res) {
 
 		print STDERR "  * found $purse->{pursename} - $purse->{amount} $purse->{desc}\n";
 	}
 
-	# If we have Z-purse with non-zero balance, it's the choice. Otherwise look for R-purse. Otherwise any other
+	# If we have R-purse with non-zero balance, it's the choice. Otherwise look for Z-purse. Otherwise any other
 
 	my %priority = (
 		WMR => 2,
@@ -489,4 +489,4 @@ my $contragent_purse;
 	print STDERR "==== PASSED ====\n\n";
 }
 
-print STDERR "All tests have been successfully passed. Business::Webmoney is happy to serve you.\n";
+print STDERR "All tests have been successfully passed. Business::WebMoney is happy to serve you.\n";

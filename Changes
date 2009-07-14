@@ -1,5 +1,8 @@
 Revision history for Perl extension Business::WebMoney.
 
+0.08  Tue Jul 14 00:06:32 MSD 2009
+	- HTTPS timeouts reimplemented using SIGALRM
+
 0.07  Wed Feb 18 00:59:00 2009
 	- Exdended semi-manual test added
 	- Bugfix with utf8 support
