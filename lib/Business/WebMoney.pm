@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Carp;
 use LWP::UserAgent;
@@ -83,11 +83,11 @@ sub request
 {
 	my ($self, %args) = @_;
 
-	my $old_locale = POSIX::setlocale(POSIX::LC_ALL, 'C');
+	my $old_locale = POSIX::setlocale(&POSIX::LC_ALL, 'C');
 
 	my $res = $self->do_request(%args);
 
-	POSIX::setlocale(POSIX::LC_ALL, $old_locale);
+	POSIX::setlocale(&POSIX::LC_ALL, $old_locale);
 
 	return $res;
 }
