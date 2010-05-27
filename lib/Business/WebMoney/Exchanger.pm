@@ -6,7 +6,7 @@ use warnings;
 
 use Business::WebMoney;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp;
 use LWP::UserAgent;
@@ -53,7 +53,7 @@ sub best_rates
 
 			my $req = HTTP::Request->new;
 			$req->method('GET');
-			$req->uri('http://wm.exchanger.ru/asp/XMLbestRates.asp');
+			$req->uri('https://wm.exchanger.ru/asp/XMLbestRates.asp');
 
 			my $res = $ua->request($req);
 
