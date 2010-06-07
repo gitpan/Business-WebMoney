@@ -1,5 +1,7 @@
 Revision history for Perl extension Business::WebMoney.
 
+0.11  Mon Jun  7 13:27:34 MSD 2010
+	- WebMoney root certificate updated
 0.09  Tue Jul 24 15:26:34 MSD 2009
 0.08  Tue Jul 14 00:06:32 MSD 2009
 	- HTTPS timeouts reimplemented using SIGALRM
